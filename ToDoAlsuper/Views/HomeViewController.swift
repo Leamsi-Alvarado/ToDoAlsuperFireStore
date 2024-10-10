@@ -7,26 +7,67 @@
 
 import UIKit
 import FirebaseAuth
-import CoreData
+import FirebaseFirestore
 
-class HomeViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, NSFetchedResultsControllerDelegate{
-
-    
-
+class HomeViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
     @IBOutlet weak var tasksTable: UITableView!
-    var tasks = [Tasks]()
-    var fetchResultController : NSFetchedResultsController<Tasks>!
+    var selectedTask: Task?
+    var selectedIndexPath: IndexPath?
+    var tasks: [Task] = []
+    let db = Firestore.firestore()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         tasksTable.delegate = self
         tasksTable.dataSource = self
-        showTasks()
+        
+        observeTasks()
     }
     
+    func observeTasks() {
+        guard let userId = Auth.auth().currentUser?.uid else { return }
+
+        db.collection("tasks")
+            .whereField("userId", isEqualTo: userId)
+            .addSnapshotListener { [weak self] (snapshot, error) in
+                guard let self = self else { return }
+                if let error = error {
+                    print("Error obteniendo tareas: \(error)")
+                    return
+                }
+
+                self.tasks.removeAll()
+                
+                for document in snapshot!.documents {
+                    let data = document.data()
+                    let title = data["title"] as? String ?? ""
+                    let subtitle = data["subtitle"] as? String ?? ""
+                    let completed = data["completed"] as? Bool ?? false
+                    let id = document.documentID
+                    
+                    let task = Task(id: id, title: title, subtitle: subtitle, completed: completed, userId: data["userId"] as? String ?? "")
+                    self.tasks.append(task)
+                }
+                
+                self.tasksTable.reloadData()
+            }
+    }
+
+
+    func deleteTask(at indexPath: IndexPath) {
+        let taskToDelete = tasks[indexPath.row]
+        db.collection("tasks").document(taskToDelete.id).delete { error in
+            if let error = error {
+                print("Error al eliminar la tarea: \(error)")
+            } else {
+                print("Tarea eliminada correctamente")
+            }
+        }
+    }
+
     
-    //IBACTION con 3 botones para llamar filterTasks con su respectivo case
     @IBAction func filterByTitle(_ sender: Any) {
         filterTasks(by: "title")
     }
@@ -39,15 +80,11 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         filterTasks(by: "completed")
     }
     
-    
-    
     @IBAction func logout(_ sender: Any) {
         try! Auth.auth().signOut()
         UserDefaults.standard.removeObject(forKey: "session")
-        
         dismiss(animated: true, completion: nil)
     }
-    
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return tasks.count
@@ -80,62 +117,14 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
 
 
-
-
-
-    
-    func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        let delete = UIContextualAction(style: .destructive, title: "delete"){(_,_,_)in
-            let context = TaskModel.shared.context()
-            let delete = self.fetchResultController.object(at: indexPath)
-            context.delete(delete)
-            
-            do {
-                try context.save()
-            } catch let error as NSError {
-                print("no se pudo eliminar", error)
-            }
-        }
-        
-        
-        delete.image = UIImage(systemName: "pencil.circle.fill")
-        delete.backgroundColor = .systemPink
-        return UISwipeActionsConfiguration(actions: [delete])
-    }
-    
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let task = self.fetchResultController.object(at: indexPath)
-        let context = TaskModel.shared.context()
-
-        
-        task.completed.toggle()
-
-        do {
-            try context.save()
-        } catch let error as NSError {
-            print("No se pudo actualizar la tarea", error)
-        }
-
-        tableView.reloadRows(at: [indexPath], with: .automatic)
-    }
-    
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == "sendData"{
-            if let id = tasksTable.indexPathForSelectedRow{
-                let row = tasks[id.row]
-                let destination = segue.destination as! AddTaskViewController
-                destination.task = row
-            }
-        }
-    }
-    
     func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         let editAction = UIContextualAction(style: .normal, title: "Edit") { (_, _, completionHandler) in
-            
+            self.selectedTask = self.tasks[indexPath.row]
+            self.selectedIndexPath = indexPath
             self.performSegue(withIdentifier: "sendData", sender: self)
             completionHandler(true)
         }
-        
+
         editAction.backgroundColor = .systemCyan
         editAction.image = UIImage(systemName: "pencil.circle.fill")
         
@@ -143,89 +132,110 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
 
 
+
+    
+    func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        let delete = UIContextualAction(style: .destructive, title: "Delete") { (action, view, completionHandler) in
+            self.deleteTask(at: indexPath)
+            completionHandler(true)
+        }
+        delete.image = UIImage(systemName: "trash")
+        delete.backgroundColor = .red
+        return UISwipeActionsConfiguration(actions: [delete])
+    }
+
+
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    
+        var task = tasks[indexPath.row]
+        
+        task.completed.toggle()
+        
+        tasks[indexPath.row] = task
+    
+        db.collection("tasks").document(task.id).updateData(["completed": task.completed]) { error in
+            if let error = error {
+                print("Error al actualizar el estado de la tarea: \(error)")
+            } else {
+                print("Estado de la tarea actualizado correctamente")
+            }
+        }
+        
+        
+        tableView.reloadRows(at: [indexPath], with: .automatic)
+    }
+
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "sendData" {
+            if let indexPath = selectedIndexPath {
+                let row = tasks[indexPath.row]
+                let destination = segue.destination as! AddTaskViewController
+                destination.task = row
+            }
+        }
+    }
+
     
     func showTasks() {
-        let context = TaskModel.shared.context()
-        let fetchRequest : NSFetchRequest<Tasks> = Tasks.fetchRequest()
-        let order = NSSortDescriptor(key: "title", ascending: true)
-        fetchRequest.sortDescriptors = [order]
-        fetchResultController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: context, sectionNameKeyPath: nil, cacheName: nil)
-        fetchResultController.delegate = self
-        
-        do {
-            try fetchResultController.performFetch()
-            tasks = fetchResultController.fetchedObjects!
-        } catch let error as NSError {
-            print("no se mostraron las tareas",  error.localizedDescription)
-        }
+        guard let userId = Auth.auth().currentUser?.uid else { return }
+
+        db.collection("tasks")
+            .whereField("userId", isEqualTo: userId)
+            .order(by: "title")
+            .getDocuments { (querySnapshot, error) in
+                if let error = error {
+                    print("Error al obtener las tareas: \(error.localizedDescription)")
+                } else {
+                    self.tasks = querySnapshot?.documents.compactMap { document -> Task? in
+                        let data = document.data()
+                        return Task(id: document.documentID, title: data["title"] as? String ?? "", subtitle: data["subtitle"] as? String ?? "", completed: data["completed"] as? Bool ?? false, userId: data["userId"] as? String ?? "")
+                    } ?? []
+                    self.tasksTable.reloadData()
+                }
+            }
     }
-    
-    
-    
-    func controllerWillChangeContent(_ controller: NSFetchedResultsController<any NSFetchRequestResult>) {
-        tasksTable.beginUpdates()
-    }
-    
-    func controllerDidChangeContent(_ controller: NSFetchedResultsController<any NSFetchRequestResult>) {
-        tasksTable.endUpdates()
-    }
-    
-    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?){
-        
-        switch type {
-        case .insert:
-            self.tasksTable.insertRows(at: [newIndexPath!], with: .fade)
-        case .delete:
-            self.tasksTable.deleteRows(at: [indexPath!], with: .fade)
-        case .update:
-            self.tasksTable.reloadRows(at: [indexPath!], with: .fade )
-        default:
-            self.tasksTable.reloadData()
-        }
-        self.tasks = controller.fetchedObjects as! [Tasks]
-        
-    }
+
+
     
     func filterTasks(by criteria: String) {
-        let context = TaskModel.shared.context()
-        let fetchRequest: NSFetchRequest<Tasks> = Tasks.fetchRequest()
-        
+        guard let userId = Auth.auth().currentUser?.uid else { return }
+
+        var query: Query!
+
         switch criteria {
         case "title":
-            
-            let titlePredicate = NSPredicate(format: "title != nil")
-            fetchRequest.predicate = titlePredicate
-            let titleSortDescriptor = NSSortDescriptor(key: "title", ascending: true)
-            fetchRequest.sortDescriptors = [titleSortDescriptor]
-            
+            query = db.collection("tasks")
+                .whereField("userId", isEqualTo: userId)
+                .order(by: "title")
         case "subtitle":
-            let subtitlePredicate = NSPredicate(format: "subtitle != nil")
-            fetchRequest.predicate = subtitlePredicate
-            let subtitleSortDescriptor = NSSortDescriptor(key: "subtitle", ascending: true)
-            fetchRequest.sortDescriptors = [subtitleSortDescriptor]
-            
+            query = db.collection("tasks")
+                .whereField("userId", isEqualTo: userId)
+                .order(by: "subtitle")
         case "completed":
-            let completedPredicate = NSPredicate(format: "completed == %@", NSNumber(value: true))
-            fetchRequest.predicate = completedPredicate
-            let completedSortDescriptor = NSSortDescriptor(key: "title", ascending: true)
-            fetchRequest.sortDescriptors = [completedSortDescriptor]
-            
+            query = db.collection("tasks")
+                .whereField("userId", isEqualTo: userId)
+                .whereField("completed", isEqualTo: true)
+                .order(by: "title")
         default:
-            break
+            query = db.collection("tasks").whereField("userId", isEqualTo: userId)
         }
-        
-        fetchResultController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: context, sectionNameKeyPath: nil, cacheName: nil)
-        fetchResultController.delegate = self
-        
-        do {
-            try fetchResultController.performFetch()
-            tasks = fetchResultController.fetchedObjects ?? []
-            tasksTable.reloadData()
-        } catch let error as NSError {
-            print("No se pudieron mostrar las tareas filtradas: \(error.localizedDescription)")
+
+        query.getDocuments { (querySnapshot, error) in
+            if let error = error {
+                print("No se pudieron mostrar las tareas filtradas: \(error.localizedDescription)")
+            } else {
+                self.tasks = querySnapshot?.documents.compactMap { document -> Task? in
+                    let data = document.data()
+                    return Task(id: document.documentID, title: data["title"] as? String ?? "", subtitle: data["subtitle"] as? String ?? "", completed: data["completed"] as? Bool ?? false, userId: data["userId"] as? String ?? "")
+                } ?? []
+                self.tasksTable.reloadData()
+            }
         }
     }
 
 
-    
+
+
 }
+

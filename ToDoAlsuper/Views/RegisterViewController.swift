@@ -6,7 +6,6 @@
 //
 
 import UIKit
-
 class RegisterViewController: UIViewController {
 
     @IBOutlet weak var secondPass: UITextField!
@@ -49,3 +48,4 @@ class RegisterViewController: UIViewController {
     }
 
 }
+
