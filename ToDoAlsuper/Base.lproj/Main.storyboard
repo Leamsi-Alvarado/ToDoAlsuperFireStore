@@ -59,7 +59,7 @@
                                     <color key="baseBackgroundColor" name="primaryButton"/>
                                 </buttonConfiguration>
                                 <connections>
-                                    <action selector="login:" destination="BYZ-38-t0r" eventType="touchUpInside" id="K4D-ch-ZBp"/>
+                                    <action selector="login:" destination="BYZ-38-t0r" eventType="touchUpInside" id="f8q-KG-WR3"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="VJB-Bw-Ogw">
@@ -75,7 +75,6 @@
                                     <color key="baseBackgroundColor" name="primaryButton"/>
                                 </buttonConfiguration>
                                 <connections>
-                                    <action selector="register:" destination="BYZ-38-t0r" eventType="touchUpInside" id="5c0-7w-Sbm"/>
                                     <segue destination="EHO-Zc-57n" kind="modal" identifier="register" modalPresentationStyle="fullScreen" id="uOp-KI-axb"/>
                                 </connections>
                             </button>
@@ -104,6 +103,18 @@
                                     <fontDescription key="fontDescription" type="system" pointSize="20"/>
                                 </variation>
                             </textField>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="yNC-pW-xKL">
+                                <rect key="frame" x="356" y="488.66666666666669" width="20" height="20"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="20" id="3aO-D0-YNz"/>
+                                    <constraint firstAttribute="height" constant="20" id="B84-lC-Hve"/>
+                                </constraints>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="plain" image="eye.circle.fill" catalog="system"/>
+                                <connections>
+                                    <action selector="showPass:" destination="BYZ-38-t0r" eventType="touchUpInside" id="p5G-OV-iH5"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" name="backgroundColor"/>
@@ -111,8 +122,10 @@
                             <constraint firstItem="RgB-6b-jjE" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="1BD-T5-Pxf"/>
                             <constraint firstItem="koD-uu-eBS" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="21W-aY-dGG"/>
                             <constraint firstItem="xA4-eP-ofc" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="7hc-yx-2We"/>
+                            <constraint firstItem="dky-Ht-Hbw" firstAttribute="top" secondItem="koD-uu-eBS" secondAttribute="bottom" constant="25" id="82w-S1-bKq"/>
+                            <constraint firstItem="yNC-pW-xKL" firstAttribute="top" secondItem="xA4-eP-ofc" secondAttribute="bottom" constant="32" id="9Xe-pT-CxV"/>
+                            <constraint firstItem="yNC-pW-xKL" firstAttribute="leading" secondItem="koD-uu-eBS" secondAttribute="trailing" constant="5" id="ITe-cW-tDk"/>
                             <constraint firstItem="dky-Ht-Hbw" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="OEY-hS-VeB"/>
-                            <constraint firstItem="dky-Ht-Hbw" firstAttribute="top" secondItem="koD-uu-eBS" secondAttribute="bottom" constant="25" id="RaS-jz-xOr"/>
                             <constraint firstItem="VJB-Bw-Ogw" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="T3i-DA-sYq"/>
                             <constraint firstItem="gm4-Lb-gad" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" constant="-50" id="ZlW-ZD-26t"/>
                             <constraint firstItem="gm4-Lb-gad" firstAttribute="top" secondItem="RgB-6b-jjE" secondAttribute="bottom" constant="42.5" id="bkk-XF-Hrc"/>
@@ -131,7 +144,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1065" y="-2.112676056338028"/>
+            <point key="canvasLocation" x="1064.1791044776119" y="-2.7459954233409607"/>
         </scene>
         <!--Home View Controller-->
         <scene sceneID="wmC-KF-HTI">
@@ -410,7 +423,7 @@
                                     <color key="baseForegroundColor" name="primaryText"/>
                                 </buttonConfiguration>
                                 <connections>
-                                    <action selector="goBack:" destination="EHO-Zc-57n" eventType="touchUpInside" id="zep-5z-tYy"/>
+                                    <action selector="goBack:" destination="EHO-Zc-57n" eventType="touchUpInside" id="YmD-Oa-q7b"/>
                                 </connections>
                             </button>
                         </subviews>
@@ -470,6 +483,7 @@
     </inferredMetricsTieBreakers>
     <color key="tintColor" name="primaryText"/>
     <resources>
+        <image name="eye.circle.fill" catalog="system" width="128" height="123"/>
         <image name="plus" catalog="system" width="128" height="113"/>
         <image name="todo" width="1024" height="1024"/>
         <namedColor name="backgroundColor">

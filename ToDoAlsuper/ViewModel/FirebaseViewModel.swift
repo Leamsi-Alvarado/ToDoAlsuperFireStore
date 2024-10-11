@@ -8,38 +8,39 @@
 import Foundation
 import FirebaseAuth
 
+// Creamos ViewModel con la sintaxis que nos proporciona Firebase para completar un Auth correcto
 class FireBaseViewModel{
-        
+    
+    // Se debe de crear un shared, para que los viewcontrollers tengan acceso a las funciones de la Clase
     public static let shared = FireBaseViewModel()
     
-    func login(email:String, pass: String, completion: @escaping (_ done: Bool) -> Void ){
-         Auth.auth().signIn(withEmail: email, password: pass) { (user, error) in
-             if user != nil {
-                 print("Entro")
-                 completion(true)
-             }else{
-                 if let error = error?.localizedDescription {
-                     print("Error en firebase", error)
-                 }else{
-                     print("Error en la app")
-                 }
-             }
-         }
-     }
-     
-     func createUser(email:String, pass: String, completion: @escaping (_ done: Bool) -> Void ){
-         Auth.auth().createUser(withEmail: email, password: pass) { (user, error) in
-             if user != nil {
-                 print("Entro y se registro")
-                 completion(true)
-             }else{
-                 if let error = error?.localizedDescription {
-                     print("No puede registrarse", error)
-                 }else{
-                     print("Error en la app")
-                 }
-             }
-         }
-     }
+    // Funcion login, parámetros: email, pass, completion.
+    func login(email: String, pass: String, completion: @escaping (_ done: Bool, _ errorMessage: String?) -> Void) {
+        Auth.auth().signIn(withEmail: email, password: pass) { (result, error) in
+            if result != nil {
+                completion(true, nil) // El usuario fue aceptado
+            } else {
+                if let error = error?.localizedDescription {
+                    completion(false, error) // Devolver el error a la vista
+                } else {
+                    completion(false, "Error en la app") // Error no identificado
+                }
+            }
+        }
+    }
     
+    // Funcion para crear usuario
+    func createUser(email: String, pass: String, completion: @escaping (_ done: Bool, _ errorMessage: String?) -> Void) {
+        Auth.auth().createUser(withEmail: email, password: pass) { (result, error) in
+            if result != nil {
+                completion(true, nil) // El usuario fue aceptado y puede entrar
+            } else {
+                if let error = error?.localizedDescription {
+                    completion(false, error) // Devolver el error a la vista
+                } else {
+                    completion(false, "Error en la app") // Error no identificado
+                }
+            }
+        }
+    }
 }

@@ -17,34 +17,57 @@ class RegisterViewController: UIViewController {
         
     }
     
-
+//boton registrar
     @IBAction func register(_ sender: Any) {
-        
-        guard let emailtext = email.text else { return  }
-        guard let passtext = password.text else { return }
-        guard let secpasstext = secondPass.text else {return}
-        
-        if (passtext == secpasstext){
-            FireBaseViewModel.shared.createUser(email: emailtext, pass: passtext){ (done) in
-                self.dismissSegue()
+        // nos protegemos de campos vacios
+        guard let emailText = email.text, !emailText.isEmpty else {
+            showAlert(message: "Por favor, ingresa tu correo electrónico.")
+            return
+        }
+        guard let passText = password.text, !passText.isEmpty else {
+            showAlert(message: "Por favor, ingresa una contraseña.")
+            return
+        }
+        guard let secPassText = secondPass.text, !secPassText.isEmpty else {
+            showAlert(message: "Por favor, confirma tu contraseña.")
+            return
+        }
+
+        // Si el password y el second password son iguales, entonces
+        if passText == secPassText {
+            FireBaseViewModel.shared.createUser(email: emailText, pass: passText) { (done, errorMessage) in
+                if done {
+                    // Si el registro es exitoso, cerramos el register y volvemos al login
+                    self.dismissSegue()
+                } else if let errorMessage = errorMessage {
+                    // Si hay un error, mostramos una alerta con el mensaje de error
+                    self.showAlert(message: errorMessage)
+                }
             }
+        } else {
+            //alerta por match de contraseñas
+            showAlert(message: "Las contraseñas no coinciden.")
         }
     }
-    
-    func actionSegue(identifier: String){
-        performSegue(withIdentifier: identifier, sender: self)
-    }
-    
+    //borramos los textfields
     func cleanTextFields(){
         email.text = ""
         password.text = ""
     }
     
     @IBAction func goBack(_ sender: Any) {
-        dismissSegue()
+        self.dismissSegue()
     }
+    //funcion para volver
     func dismissSegue(){
         dismiss(animated: true, completion: nil)
+    }
+
+    
+    func showAlert(message: String) {
+        let alert = UIAlertController(title: "Error", message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+        self.present(alert, animated: true, completion: nil)
     }
 
 }
