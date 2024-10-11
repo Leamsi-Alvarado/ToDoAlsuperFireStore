@@ -1,18 +1,18 @@
-#Leamsi Alvarado
+# Leamsi Alvarado
 Contacto: leamsi-a-alvarado-g@outlook.com
 ## ToDo - Alsuper - FireStore
  Fecha de inicio: 9/OCT/2024 \
  Fecha solicitada entrega: 11/OCT/2024 \
  Versión CoreData: https://github.com/Leamsi-Alvarado/ToDoAlsuper \
  Esta fue la primera versión sin FireStore, sin responsive, sin dark mode, entre otras funciones que la version de FireStore si tiene, solamente es por si interesa ver el dominio de CoreData
-#Frameworks utilizados
+# Frameworks utilizados
 ## UiKit (Storyboards)
 
-#Como correr la Aplicación\
-##La aplicación está lista para plug and play, en caso de ser necesario instalar dependencias de FireBase en la aplicación\
+# Como correr la Aplicación
+## La aplicación está lista para plug and play, en caso de ser necesario instalar dependencias de FireBase en la aplicación\
 para Realizarlo es necesario entrar en xcode -> Dar click en file -> Add Package dependencies -> pegar https://github.com/firebase/firebase-ios-sdk en el buscador e instalar Firebase, fireabaseAuth, FireStore
 
-#Explicación de aplicación
+# Explicación de aplicación
 Esta aplicación es un TodoList, tendremos: \
  [Login](#0a192f) -> para demostrar las habilidades con servicios de Authentication de Firebase, Proteccion visual de contraseñas.\
 [Register](#0a192f) -> Para demostrar las habilidad con servicios de auth de firebase con la creación de usuarios.\
