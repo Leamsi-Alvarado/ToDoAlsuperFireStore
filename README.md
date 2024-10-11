@@ -8,9 +8,9 @@ Contacto: leamsi-a-alvarado-g@outlook.com
 # Frameworks utilizados
  UiKit (Storyboards)
 # Puntos de la aplicación
-Authentication con Firestore
-Guardado de datos con FireStore
-Responsive para Iphone's y Ipad's
+Authentication con Firestore\
+Guardado de datos con FireStore\
+Responsive para Iphone's y Ipad's\
 Dark y Light mode activado -> Cambiar ambiente en Modo Obscuro en las configuraciones del simulador
 # Como correr la Aplicación
  La aplicación está lista para plug and play con la descarga de Xcode y un simulador, en caso de ser necesario instalar dependencias de FireBase en la aplicación\
