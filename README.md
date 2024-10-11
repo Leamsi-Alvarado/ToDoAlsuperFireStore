@@ -7,9 +7,13 @@ Contacto: leamsi-a-alvarado-g@outlook.com
  Esta fue la primera versión sin FireStore, sin responsive, sin dark mode, entre otras funciones que la version de FireStore si tiene, solamente es por si interesa ver el dominio de CoreData
 # Frameworks utilizados
  UiKit (Storyboards)
-
+# Puntos de la aplicación
+Authentication con Firestore
+Guardado de datos con FireStore
+Responsive para Iphone's y Ipad's
+Dark y Light mode activado -> Cambiar ambiente en Modo Obscuro en las configuraciones del simulador
 # Como correr la Aplicación
- La aplicación está lista para plug and play, en caso de ser necesario instalar dependencias de FireBase en la aplicación\
+ La aplicación está lista para plug and play con la descarga de Xcode y un simulador, en caso de ser necesario instalar dependencias de FireBase en la aplicación\
 para Realizarlo es necesario entrar en xcode -> Dar click en file -> Add Package dependencies -> pegar https://github.com/firebase/firebase-ios-sdk en el buscador e instalar Firebase, fireabaseAuth, FireStore
 
 # Explicación de aplicación
