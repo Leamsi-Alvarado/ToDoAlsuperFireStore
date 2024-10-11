@@ -4,7 +4,7 @@ Contacto: leamsi-a-alvarado-g@outlook.com
  Fecha de inicio: 10/OCT/2024 \
  Fecha solicitada entrega: 11/OCT/2024 \
  Versión CoreData: https://github.com/Leamsi-Alvarado/ToDoAlsuper \
- Esta fue la primera versión sin FireStore, sin responsive, sin dark mode, entre otras funciones que la version de FireStore si tiene, solamente es por si interesa ver el dominio de CoreData
+ Ese link es la primera versión, sin FireStore, sin responsive, sin dark mode, entre otras funciones que la version de FireStore si tiene, solamente es por si interesa ver el dominio de CoreData
 # Frameworks utilizados
  UiKit (Storyboards)
 # Puntos de la aplicación
